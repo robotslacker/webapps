@@ -11,8 +11,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.json.JSONObject;
-import org.apache.log4j.Logger;
+
 /**
  *
  * @author shi.zhao
@@ -140,7 +141,7 @@ public class Worker extends Thread
         }
         m_ServiceHandle.setConsole(m_ConsoleLogs);
         this.appendLog("[Worker-" + this.getJobID() + "]: will start service [" + this.getServiceName() + "] ... ");
-        Logger.getRootLogger().info("[Worker-" + this.getJobID() + "]: will start service [" + this.getServiceName() + "] ... ");
+        Logger.getLogger("SSHAgentServer").log(Level.INFO, "[Worker-{0}]: will start service [{1}] ... ", new Object[]{this.getJobID(), this.getServiceName()});
         JSONObject m_Return = m_ServiceHandle.DoService();
         if (m_Return.has("error_code"))
         {
@@ -151,7 +152,7 @@ public class Worker extends Thread
             }
         }
         this.appendLog("[Worker-" + this.getJobID() + "]: Done. [" + this.getServiceName() + "]");
-        Logger.getRootLogger().info("[Worker-" + this.getJobID() + "]: Done. [" + this.getServiceName() + "] ");
+        Logger.getLogger("SSHAgentServer").log(Level.INFO, "[Worker-{0}]: Done. [{1}] ", new Object[]{this.getJobID(), this.getServiceName()});
         EndTime = new Date();
         EndTime.setTime(System.currentTimeMillis());
         return m_Return;
@@ -171,7 +172,7 @@ public class Worker extends Thread
             }
             m_ServiceHandle.setConsole(m_ConsoleLogs);
             this.appendLog("[Worker-" + this.getJobID() + "]: will start service [" + this.getServiceName() + "] ... ");
-            Logger.getRootLogger().info("[Worker-" + this.getJobID() + "]: will start service [" + this.getServiceName() + "] ... ");
+            Logger.getLogger("SSHAgentServer").info("[Worker-" + this.getJobID() + "]: will start service [" + this.getServiceName() + "] ... ");
             JSONObject m_Return = m_ServiceHandle.DoService();
             if (m_Return.has("error_code"))
             {
@@ -181,7 +182,7 @@ public class Worker extends Thread
                 }
             }
             this.appendLog("[Worker-" + this.getJobID() + "]: Done. [" + this.getServiceName() + "]");
-            Logger.getRootLogger().info("[Worker-" + this.getJobID() + "]: Done. [" + this.getServiceName() + "] ");
+            Logger.getLogger("SSHAgentServer").log(Level.INFO, "[Worker-{0}]: Done. [{1}] ", new Object[]{this.getJobID(), this.getServiceName()});
             EndTime = new Date();
             EndTime.setTime(System.currentTimeMillis());
         } catch (InterruptedException ex) 

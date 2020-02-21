@@ -15,10 +15,11 @@ package com.robotslacker.sshagent.service;
 
 import java.util.HashMap;
 import org.json.JSONObject;
-import org.apache.log4j.Logger;
 import org.json.JSONException;
 import com.robotslacker.sshagent.util.SSHUtil;
 import com.robotslacker.sshagent.service.internal.Service;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -61,7 +62,7 @@ public class doRemoteSSHCommand extends Service
         catch (JSONException ex)
         {
             this.appendLog(ex.getMessage());
-            Logger.getRootLogger().error(ex);
+            Logger.getLogger("SSHAgentServer").log(Level.SEVERE, ex.getMessage(), ex);
             JSONObject  m_Return = new JSONObject();
             m_Return.put("error_id", -30001);
             m_Return.put("error_msg", "Command executed failed!");

@@ -12,11 +12,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.ConsoleAppender;
-import org.apache.log4j.Logger;
-import org.apache.log4j.PatternLayout;
-import org.apache.log4j.RollingFileAppender;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -28,6 +23,10 @@ import java.util.logging.Level;
 import org.json.JSONObject;
 import com.robotslacker.sshagent.service.internal.Worker;
 import com.robotslacker.sshagent.service.internal.WorkerService;
+import java.util.logging.FileHandler;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 
 /**
  *
@@ -47,49 +46,32 @@ public class SSHAgentServer  extends HttpServlet
     }    
     public static void StartLogger()
     {
-        String  m_szLogFileName = getAppLogFileName();
-        PatternLayout pl = new PatternLayout("%d %-5p %c - %m%n");
-        if (m_szLogFileName != null)
-        {
-            System.out.println("RobotJulie log will redirect to [" + m_szLogFileName + "]");
-            RollingFileAppender rfa;
-            try
-            {
-                rfa = new RollingFileAppender(pl,m_szLogFileName);
-                rfa.setMaximumFileSize(102400);
-                rfa.setMaxBackupIndex(10);
-                Logger.getRootLogger().addAppender(rfa);
-            }
-            catch (IOException ie)
-            {
-                System.out.println("RobotJulie logger start fail, will redirect to [console] ... ");
-                ie.printStackTrace();
-                ConsoleAppender ca = new ConsoleAppender(pl);
-                BasicConfigurator.configure(ca);
-                Logger.getRootLogger().addAppender(ca);
-            }
-        }
-        else
-        {
-            System.out.println("RobotJulie log will redirect to [console] ... ");
-            ConsoleAppender ca = new ConsoleAppender(pl);
-            BasicConfigurator.configure(ca);
-            Logger.getRootLogger().addAppender(ca);
-        }
+        int LOGFILE_SIZE = 10240;
 
+        try
+        {
+            String  m_szLogFileName = getAppLogFileName();
+            Logger logger = Logger.getLogger(SSHAgentServer.class.getName());
+            FileHandler handler = new FileHandler(m_szLogFileName, LOGFILE_SIZE, 5, true);
+            handler.setFormatter(new SimpleFormatter());
+            logger.addHandler(handler);
+            logger.setUseParentHandlers(false);
+        }
+        catch (IOException ie)
+        {
+            System.out.println("RobotSlacker logger start fail, will redirect to [console] ... ");
+            ie.printStackTrace();
+            Logger logger = Logger.getLogger(SSHAgentServer.class.getName());
+            logger.addHandler(new ConsoleHandler());
+        }
         java.util.logging.Logger.getLogger("org.apache.http.wire").setLevel(java.util.logging.Level.FINEST);
         java.util.logging.Logger.getLogger("org.apache.http.headers").setLevel(java.util.logging.Level.FINEST);                
-        System.setProperty("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.SimpleLog");
-        System.setProperty("org.apache.commons.logging.simplelog.showdatetime", "true");
-        System.setProperty("org.apache.commons.logging.simplelog.log.httpclient.wire", "ERROR");
-        System.setProperty("org.apache.commons.logging.simplelog.log.org.apache.http", "ERROR");
-        System.setProperty("org.apache.commons.logging.simplelog.log.org.apache.http.headers", "ERROR");        
     }    
     
     @Override
     public void init(ServletConfig config) throws ServletException 
     {
-	super.init(config);
+        super.init(config);
         setAppLogFileName(config.getInitParameter("appLogFileName"));
         StartLogger();
     }
@@ -129,7 +111,7 @@ public class SSHAgentServer  extends HttpServlet
         } 
         catch (Exception ex) 
         {
-            java.util.logging.Logger.getLogger(SSHAgentServer.class.getName()).log(Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger("SSHAgentServer").log(Level.SEVERE, null, ex);
         }
     }
     
@@ -192,7 +174,7 @@ public class SSHAgentServer  extends HttpServlet
         }
         catch (IOException ex)
         {
-            Logger.getRootLogger().error(ex);
+            Logger.getLogger("SSHAgentServer").log(Level.SEVERE, ex.getMessage(), ex);
         }
     }
 
@@ -240,7 +222,7 @@ public class SSHAgentServer  extends HttpServlet
         }
         catch (IOException ex)
         {
-            Logger.getRootLogger().error(ex);
+            Logger.getLogger("SSHAgentServer").log(Level.SEVERE, ex.getMessage(), ex);
         }
     }
     
